@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CalculatorTemplateForWindows" GeneratedClassName="Settings1">
+  <Profiles />
+  <Settings>
+    <Setting Name="pathToInterpreterForPython" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">"\\Python\\Python310\\python.exe"</Value>
+    </Setting>
+    <Setting Name="pathToPythonLib" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">"\\CalculatorTemplateForWindows\\CalculatorTemplateForWindows\\PythonLib\\abstract_calculator.py"</Value>
+    </Setting>
+    <Setting Name="pathToOutputFile" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">"\\CalculatorTemplateForWindows\\CalculatorTemplateForWindows\\Output\\output.txt"</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
