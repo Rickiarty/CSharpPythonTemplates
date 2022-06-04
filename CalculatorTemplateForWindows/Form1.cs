@@ -125,25 +125,25 @@ namespace CalculatorTemplateForWindows
 
         private void button15_Click(object sender, EventArgs e)
         {
-            // �� 
+            // ÷ 
             this.setOperation("/");
         }
 
         private void button14_Click(object sender, EventArgs e)
         {
-            // �� 
+            // × 
             this.setOperation("*");
         }
 
         private void button13_Click(object sender, EventArgs e)
         {
-            // �� 
+            // －  
             this.setOperation("-");
         }
 
         private void button12_Click(object sender, EventArgs e)
         {
-            // �� 
+            // ＋ 
             this.setOperation("+");
         }
 
