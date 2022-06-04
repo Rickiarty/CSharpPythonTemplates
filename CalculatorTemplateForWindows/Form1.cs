@@ -237,7 +237,7 @@ namespace CalculatorTemplateForWindows
         {
             // . 
             this.checkProceeded();
-            if (!this.textBox1.Text.Contains('.') && this.textBox1.Text != "") // The string in textBox1 is NOT empty. And there is NO decimal point(�p���I) in the string in textBox1. 
+            if (!this.textBox1.Text.Contains('.') && this.textBox1.Text != "") // The string in textBox1 is NOT empty. And there is NO decimal point(小數點) in the string in textBox1. 
             {
                 this.textBox1.Text += '.'; // append last 
             }
