@@ -1,14 +1,25 @@
 using System.Diagnostics;
 using System.Configuration;
+using System;
+using System.Runtime.InteropServices;
 
 namespace CalculatorTemplateForWindows
 {
     public partial class Form1 : Form
     {
-        protected string pathToInterpreterForPython = "\\Python\\Python310\\python.exe";
-        protected string pathToPythonLib = "\\CalculatorTemplateForWindows\\CalculatorTemplateForWindows\\PythonLib\\abstract_calculator.py";
-        protected string pathToOutputFile = "\\CalculatorTemplateForWindows\\CalculatorTemplateForWindows\\Output\\output.txt";
-        protected string operation = "";
+        [DllImport("HaskellLib\\Operation.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void hs_init(IntPtr argc, IntPtr argv);
+
+        [DllImport("HaskellLib\\Operation.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void hs_exit();
+
+        [DllImport("HaskellLib\\Operation.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int operation(int num);
+
+        protected string pathToInterpreterForPython = "(Set this field in your personal settings in the 'AppConfig.settings' file.)";
+        protected string pathToPythonLib = "(Set this field in your personal settings in the 'AppConfig.settings' file.)";
+        protected string pathToOutputFile = "(Set this field in your personal settings in the 'AppConfig.settings' file.)";
+        protected string operationX = "";
         protected float op1 = 0;
         protected float op2 = 0;
         protected bool proceeded = false;
@@ -16,13 +27,28 @@ namespace CalculatorTemplateForWindows
         public Form1()
         {
             InitializeComponent();
+            
+            try
+            {
+                Console.WriteLine("Initializing runtime...");
+                hs_init(IntPtr.Zero, IntPtr.Zero);
+
+                Console.WriteLine("Calling to Haskell...");
+                int index = 6;
+                int answer = operation(index);
+                Console.WriteLine("The {0}th number in Fibonnacci sequence is {1} by Haskell lib..", index, answer);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
 
             //this.pathToInterpreterForPython = ConfigurationManager.AppSettings["pathToInterpreterForPython"];
             //this.pathToPythonLib = ConfigurationManager.AppSettings["pathToPythonLib"];
             //this.pathToOutputFile = ConfigurationManager.AppSettings["pathToOutputFile"];
-            this.pathToInterpreterForPython = "(Set this field in your personal settings in the 'AppConfig.settings' file.)";
-            this.pathToPythonLib = "(Set this field in your personal settings in the 'AppConfig.settings' file.)";
-            this.pathToOutputFile = "(Set this field in your personal settings in the 'AppConfig.settings' file.)";
+            pathToInterpreterForPython = "\\Python\\Python310\\python.exe";
+            pathToPythonLib = "\\CalculatorTemplateForWindows\\CalculatorTemplateForWindows\\PythonLib\\abstract_calculator.py";
+            pathToOutputFile = "\\CalculatorTemplateForWindows\\CalculatorTemplateForWindows\\Output\\output.txt";
             this.proceeded = true;
 
             try
@@ -40,6 +66,17 @@ namespace CalculatorTemplateForWindows
         {
             DialogResult dResult = MessageBox.Show("Do you want to quit the app 'Calculator'?", "Quit", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             if (dResult == DialogResult.No) { e.Cancel = true; }
+            else 
+            {
+                try
+                {
+                    hs_exit();
+                }
+                catch (Exception ex) 
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+            }
         }
 
         protected string normalizeDecimalValueString(string str)
@@ -82,7 +119,7 @@ namespace CalculatorTemplateForWindows
         {
             ProcessStartInfo start = new ProcessStartInfo();
             start.FileName = this.pathToInterpreterForPython;
-            start.Arguments = string.Format("{0} {1}", this.pathToPythonLib, string.Format("{0} {1} {2}", this.operation, this.op1, this.op2));
+            start.Arguments = string.Format("{0} {1}", this.pathToPythonLib, string.Format("{0} {1} {2}", this.operationX, this.op1, this.op2));
             start.UseShellExecute = false;
             start.RedirectStandardOutput = true;
             using (Process process = Process.Start(start))
@@ -114,44 +151,50 @@ namespace CalculatorTemplateForWindows
             this.calcResult();
         }
 
-        protected void setOperation(string operation)
+        protected void setoperationX(string operationX)
         {
             this.textBox1.Text = this.normalizeDecimalValueString(this.textBox1.Text);
             this.op1 = float.Parse(this.textBox1.Text);
             this.textBox1.Text = "";
-            this.operation = operation;
+            this.operationX = operationX;
             this.proceeded = true;
         }
 
         private void button15_Click(object sender, EventArgs e)
         {
             // ÷ 
-            this.setOperation("/");
+            this.setoperationX("/");
         }
 
         private void button14_Click(object sender, EventArgs e)
         {
             // × 
-            this.setOperation("*");
+            this.setoperationX("*");
         }
 
         private void button13_Click(object sender, EventArgs e)
         {
-            // －  
-            this.setOperation("-");
+            // － 
+            this.setoperationX("-");
         }
 
         private void button12_Click(object sender, EventArgs e)
         {
             // ＋ 
-            this.setOperation("+");
+            this.setoperationX("+");
         }
 
         private void button16_Click(object sender, EventArgs e)
         {
-            // [operation X] 
+            // operation executed by Python 
+            // [operationX X] 
             // to customize your project for difference from other's 
-            this.setOperation("X"); // operation X 
+            //this.setoperationX("X"); // operationX X 
+
+            // operation executed by Haskell 
+            this.textBox1.Text = this.normalizeDecimalValueString(this.textBox1.Text);
+            int result = operation((int)float.Parse(this.textBox1.Text)); // execute operation from DLL imported 
+            this.textBox1.Text = result.ToString();
         }
 
         protected void checkProceeded()
@@ -253,7 +296,7 @@ namespace CalculatorTemplateForWindows
         {
             this.op1 = 0;
             this.op2 = 0;
-            this.operation = "";
+            this.operationX = "";
             this.textBox1.Text = "";
             this.proceeded = false;
         }
